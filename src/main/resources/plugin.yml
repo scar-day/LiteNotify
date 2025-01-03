@@ -1,0 +1,4 @@
+name: LiteNotify
+version: '1.1'
+main: me.scarday.litenotify.Main
+depend: [LiteBans]
