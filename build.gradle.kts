@@ -1,6 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import dev.s7a.gradle.minecraft.server.tasks.LaunchMinecraftServerTask
-
 plugins {
     id("java")
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
