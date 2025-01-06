@@ -6,7 +6,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.5"
 }
 
-group = "me.scarday"
+group = "dev.scarday"
 version = "1.2"
 
 repositories {
