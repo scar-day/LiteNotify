@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.scarday"
-version = "1.1"
+version = "1.2"
 
 repositories {
     mavenCentral()
@@ -33,8 +33,7 @@ bukkit {
     main = "dev.scarday.litenotify.Main"
     apiVersion = "1.16"
 
-    depend = listOf("LiteBans")
-    loadBefore = listOf("LiteBans")
+    softDepend = listOf("LiteBans")
 }
 
 //task<LaunchMinecraftServerTask>("launchMinecraftServer") {

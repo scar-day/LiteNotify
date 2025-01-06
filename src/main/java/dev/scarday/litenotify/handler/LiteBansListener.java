@@ -2,33 +2,30 @@ package dev.scarday.litenotify.handler;
 
 import dev.scarday.litenotify.Main;
 import dev.scarday.litenotify.configuration.Configuration;
-import litebans.api.Entry;
-import litebans.api.Events;
-import dev.scarday.litenotify.social.Builder;
-import dev.scarday.litenotify.social.impl.TelegramImpl;
-import dev.scarday.litenotify.social.impl.VkImpl;
+import dev.scarday.litenotify.social.discord.embed.EmbedBuilder;
+import dev.scarday.litenotify.social.message.MessageBuilder;
 import lombok.val;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Listener;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.*;
+
+import litebans.api.*;
+import dev.scarday.litenotify.social.impl.*;
 
 public class LiteBansListener implements Listener {
 
     private final Main plugin;
-    private final TelegramImpl tg;
-    private final VkImpl vk;
+    private final TelegramImpl telegram;
+    private final DiscordImpl discord;
     private final Configuration config;
 
     public LiteBansListener(Main plugin) {
         this.plugin = plugin;
-        this.tg = plugin.getTg();
-        this.vk = plugin.getVk();
+        this.telegram = plugin.getTg();
+        this.discord = plugin.getDiscord();
         this.config = plugin.getConfiguration();
     }
 
@@ -53,18 +50,22 @@ public class LiteBansListener implements Listener {
                 .map(line -> replacePlaceholders(line, entry))
                 .collect(Collectors.joining("\n"));
 
-        if (tg != null) {
-            tg.sendMessage(Builder.builder()
+        if (telegram != null) {
+            telegram.sendMessage(MessageBuilder.builder()
                     .message(message)
                     .build()
             );
         }
 
-        if (vk != null) {
-            vk.sendMessage(Builder.builder()
-                    .message(message)
-                    .build()
-            );
+        if (discord != null) {
+            val messageBuilder = MessageBuilder.builder()
+                    .embed(EmbedBuilder.builder()
+                            .title(plugin.getName())
+                            .description(message)
+                            .color(16777215)
+                            .build()).build();
+
+            discord.sendMessage(messageBuilder);
         }
     }
 
@@ -86,16 +87,16 @@ public class LiteBansListener implements Listener {
                 : formatDate(entry.getDateEnd());
 
         return line
-                .replace("%player%",      user)
-                .replace("%time%",        timeStart)
-                .replace("%time_end%",    timeEnd)
-                .replace("%reason%",      entry.getReason() == null || entry.getReason().isEmpty() ? "Не указана" : entry.getReason())
-                .replace("%type%",        entry.getType())
-                .replace("%server%",      entry.getServerOrigin())
-                .replace("%servers%",     entry.getServerScope())
-                .replace("%isSilent%",    entry.isSilent() ? "Да" : "Нет")
-                .replace("%isIp%",        entry.isIpban()  ? "Да" : "Нет")
-                .replace("%exec_player%", Objects.requireNonNull(entry.getExecutorName()));
+                .replace("{player}",      user)
+                .replace("{time}",        timeStart)
+                .replace("{time_end}",    timeEnd)
+                .replace("{reason}",      entry.getReason() == null || entry.getReason().isEmpty() ? "Не указана" : entry.getReason())
+                .replace("{type}",        entry.getType())
+                .replace("{server}",      entry.getServerOrigin())
+                .replace("{servers}",     entry.getServerScope())
+                .replace("{isSilent}",    entry.isSilent() ? "Да" : "Нет")
+                .replace("{isIp}",        entry.isIpban()  ? "Да" : "Нет")
+                .replace("{exec_player}", Objects.requireNonNull(entry.getExecutorName()));
     }
 
     private String getUserName(String uuid) {

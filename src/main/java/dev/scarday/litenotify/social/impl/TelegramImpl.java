@@ -1,9 +1,10 @@
 package dev.scarday.litenotify.social.impl;
 
 import dev.scarday.litenotify.Main;
-import dev.scarday.litenotify.social.Builder;
+import dev.scarday.litenotify.social.message.MessageBuilder;
 import dev.scarday.litenotify.social.Social;
 import lombok.val;
+import org.bukkit.Bukkit;
 
 
 import java.io.BufferedReader;
@@ -17,18 +18,17 @@ import java.util.concurrent.CompletableFuture;
 
 public class TelegramImpl implements Social {
 
-    private final Main plugin;
     private final List<Integer> ids;
     private final String token;
 
     public TelegramImpl(Main plugin) {
-        this.plugin = plugin;
-        this.ids = plugin.getConfiguration().getTelegram().getIds();
-        this.token = plugin.getConfiguration().getTelegram().getToken();
+        val configuration = plugin.getConfiguration();
+        this.ids = configuration.getTelegram().getIds();
+        this.token = configuration.getTelegram().getToken();
     }
 
     @Override
-    public void sendMessage(Builder builder) {
+    public void sendMessage(MessageBuilder builder) {
         CompletableFuture.runAsync(() -> {
             for (val chatId : ids) {
                 try {
@@ -49,13 +49,13 @@ public class TelegramImpl implements Social {
                             while ((line = in.readLine()) != null) {
                                 sb.append(line);
                             }
-                            plugin.getLogger().warning("[LiteNotify] Ошибка Telegram: " + sb);
+                            Bukkit.getLogger().warning("[LiteNotify] Ошибка Telegram: " + sb);
                         }
                     }
 
                     conn.disconnect();
                 } catch (IOException e) {
-                    plugin.getLogger().severe("[LiteNotify] Ошибка Telegram: " + e.getMessage());
+                    Bukkit.getLogger().severe("[LiteNotify] Ошибка Telegram: " + e.getMessage());
                 }
             }
         });
