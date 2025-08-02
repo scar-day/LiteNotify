@@ -2,16 +2,19 @@ package dev.scarday.litenotify.social.impl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
 import dev.scarday.litenotify.Main;
+import dev.scarday.litenotify.configuration.Configuration;
 import dev.scarday.litenotify.social.discord.embed.EmbedBuilder;
 import dev.scarday.litenotify.social.message.MessageBuilder;
 import dev.scarday.litenotify.social.Social;
-import lombok.val;
+
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +23,7 @@ public class DiscordImpl implements Social {
     private final String webHookUrl;
 
     public DiscordImpl(Main plugin) {
-        val configuration = plugin.getConfiguration();
+        Configuration configuration = plugin.getConfiguration();
         this.webHookUrl = configuration.getDiscord().getWebHook();
     }
 
@@ -28,14 +31,14 @@ public class DiscordImpl implements Social {
     public void sendMessage(MessageBuilder builder) {
         CompletableFuture.runAsync(() -> {
             try {
-                val messageJson = getJsonObject(builder.getEmbed());
+                JsonObject messageJson = getJsonObject(builder.getEmbed());
 
-                val conn = (HttpURLConnection) new URL(webHookUrl).openConnection();
+                HttpURLConnection conn = (HttpURLConnection) new URL(webHookUrl).openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
                 conn.setRequestProperty("Content-Type", "application/json");
 
-                try (val outputStream = conn.getOutputStream()) {
+                try (OutputStream outputStream = conn.getOutputStream()) {
                     outputStream.write(messageJson.toString().getBytes());
                     outputStream.flush();
                 }
@@ -60,9 +63,9 @@ public class DiscordImpl implements Social {
     }
 
     private @NotNull JsonObject getJsonObject(EmbedBuilder embedBuilder) {
-        val messageJson = new JsonObject();
+        JsonObject messageJson = new JsonObject();
 
-        val embed = new JsonObject();
+        JsonObject embed = new JsonObject();
         if (embedBuilder.getTitle() != null) {
             embed.addProperty("title", embedBuilder.getTitle());
         }
@@ -73,7 +76,7 @@ public class DiscordImpl implements Social {
             embed.addProperty("color", embedBuilder.getColor());
         }
 
-        val embedsArray = new JsonArray();
+        JsonArray embedsArray = new JsonArray();
         embedsArray.add(embed);
 
         messageJson.add("embeds", embedsArray);
