@@ -23,7 +23,7 @@ public class Configuration extends OkaeriConfig {
     public static class Telegram extends OkaeriConfig {
         boolean enable = false;
         String token = "";
-        List<Integer> ids = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
     }
 
     @Setter

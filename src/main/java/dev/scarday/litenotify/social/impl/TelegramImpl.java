@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class TelegramImpl implements Social {
 
-    private final List<Integer> ids;
+    private final List<Long> ids;
     private final String token;
 
     public TelegramImpl(Main plugin) {
@@ -30,7 +30,7 @@ public class TelegramImpl implements Social {
     @Override
     public void sendMessage(MessageBuilder builder) {
         CompletableFuture.runAsync(() -> {
-            for (val chatId : ids) {
+            for (Long chatId : ids) {
                 try {
                     String urlText = URLEncoder.encode(builder.getMessage(), "UTF-8");
                     String urlStr = "https://api.telegram.org/bot" + token
