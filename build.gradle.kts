@@ -1,9 +1,9 @@
 plugins {
     id("java")
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
-    id("dev.s7a.gradle.minecraft.server") version "3.2.1"
+//    id("dev.s7a.gradle.minecraft.server") version "3.2.1"
 
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "8.3.1"
 }
 
 group = "dev.scarday"
@@ -30,10 +30,18 @@ dependencies {
 
 bukkit {
     name = "LiteNotify"
-    main = "dev.scarday.litenotify.Main"
+    main = "$group.litenotify.Main"
     apiVersion = "1.16"
 
     softDepend = listOf("LiteBans")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set(rootProject.name)
+    archiveClassifier.set("")
+    minimize()
+
+    relocate("eu.okaeri", "dev.scarday.libs.okaeri")
 }
 
 //task<LaunchMinecraftServerTask>("launchMinecraftServer") {
